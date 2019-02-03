@@ -1,36 +1,37 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import escapeRegExp from 'escape-string-regexp'
-import sortBy from 'sort-by'
+import * as BooksAPI from '../BooksAPI'
+// import escapeRegExp from 'escape-string-regexp'
+// import sortBy from 'sort-by'
 
 class SearchPage extends Component {
 
 	state = {
-		query: ''
+		query: '',
+		results: []
 	}
 
 	updateQuery = query => {
 		this.setState({ query })
+		this.updateResults(query)
 	}
 
-	clearQuery = () => {
-		this.setState({ query: '' });
+	// clearQuery = () => {
+	// 	this.setState({ query: '' });
+	// }
+	
+	updateResults = query =>	{
+		if(query) {
+			// const match = new RegExp(escapeRegExp(query), 'i');
+			BooksAPI.search(query).then(results => (
+				results.error ? this.setState({ results: [] }) : this.setState({ results })
+			))
+		} else {
+			this.setState({ results: [] });
+		}
 	}
-
 
 	render() {
-		const { query } = this.state;
-		const { books } = this.props;
-
-		let searchedBooks;
-		if(query) {
-			const match = new RegExp(escapeRegExp(query), 'i');
-			searchedBooks = books.filter(book => match.test([book.title, book.authors, book.categories]))
-		} else {
-			searchedBooks = books
-		}
-
-		searchedBooks.sort(sortBy('title'));
 
 		return (
 			<div className="search-books">
@@ -40,20 +41,25 @@ class SearchPage extends Component {
             <input 
             	type="text" 
             	placeholder="Search by title or author"
-            	value={query}
+            	value={this.state.query}
             	onChange={e => this.updateQuery(e.target.value)}
           	/>
           </div>
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-          	{searchedBooks.map(book => (
-          		<li key={book.id}>
+          	{this.state.results.map(result => {
+          		let bookShelf = "none";
+          		this.props.books.map(book => (
+          			book.id === result.id ? bookShelf = book.shelf : ''
+          		));
+          		return(
+          		<li key={result.id}>
                 <div className="book">
                   <div className="book-top">
-                    <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})`}}></div>
+                    <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${result.imageLinks ? result.imageLinks.smallThumbnail : ''})` }}></div>
                     <div className="book-shelf-changer">
-                      <select value={book.shelf} onChange={e => this.props.updateShelf(book, e.target.value)}>
+                      <select value={bookShelf} onChange={e => this.props.updateShelf(result, e.target.value)}>
                         <option value="move" disabled>Move to...</option>
                         <option value="currentlyReading">Currently Reading</option>
                         <option value="wantToRead">Want to Read</option>
@@ -62,11 +68,12 @@ class SearchPage extends Component {
                       </select>
                     </div>
                   </div>
-                  <div className="book-title">{book.title}</div>
-                  <div className="book-authors">{book.authors.map(author => `${author}`)}</div>
+                  <div className="book-title">{result.title ? result.title : ''}</div>
+                  <div className="book-authors">{result.authors ? result.authors.map(author => `${author}`) : ''}</div>
                 </div>
               </li>
-          	))}
+          	)})
+          	}
           </ol>
         </div>
       </div>

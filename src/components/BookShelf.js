@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 class BookShelf extends Component {
 	render(){
-		
+
 		const { books, updateShelf } = this.props;
 
 		return(
