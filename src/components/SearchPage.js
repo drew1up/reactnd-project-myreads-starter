@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from '../BooksAPI'
-// import escapeRegExp from 'escape-string-regexp'
-// import sortBy from 'sort-by'
 
 class SearchPage extends Component {
 
@@ -15,14 +13,9 @@ class SearchPage extends Component {
 		this.setState({ query })
 		this.updateResults(query)
 	}
-
-	// clearQuery = () => {
-	// 	this.setState({ query: '' });
-	// }
 	
 	updateResults = query =>	{
 		if(query) {
-			// const match = new RegExp(escapeRegExp(query), 'i');
 			BooksAPI.search(query).then(results => (
 				results.error ? this.setState({ results: [] }) : this.setState({ results })
 			))
@@ -69,7 +62,7 @@ class SearchPage extends Component {
                     </div>
                   </div>
                   <div className="book-title">{result.title ? result.title : ''}</div>
-                  <div className="book-authors">{result.authors ? result.authors.map(author => `${author}`) : ''}</div>
+                  <div className="book-authors">{result.authors ? result.authors.map(author => <p>{author}</p>) : ''}</div>
                 </div>
               </li>
           	)})
