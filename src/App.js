@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { Route } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
 import BookShelf from './components/BookShelf'
 import SearchPage from './components/SearchPage'
+import NoMatch from './components/NoMatch'
 
 class BooksApp extends Component {
   state = {
@@ -29,18 +30,23 @@ class BooksApp extends Component {
 
   render() {
     return (
-      <div className="app">
-        <Route exact path="/" render={() => (
-          <BookShelf 
-            books={this.state.books} 
-            updateShelf={this.updateShelf} />
-        )}/>
-        <Route path="/search" render={() => (
-          <SearchPage 
-            books={this.state.books} 
-            updateShelf={this.updateShelf} />
-        )}/>
-      </div>
+      <Router>
+        <div className="app">
+          <Switch>
+            <Route exact path="/" render={() => (
+              <BookShelf 
+                books={this.state.books} 
+                updateShelf={this.updateShelf} />
+            )}/>
+            <Route path="/search" render={() => (
+              <SearchPage 
+                books={this.state.books} 
+                updateShelf={this.updateShelf} />
+            )}/>
+            <Route component={NoMatch} />
+          </Switch>
+        </div>
+      </Router>
     )
   }
 }
